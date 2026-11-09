@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GotSpotKe · Barrier simulator (demo)</title>
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: #E8E9E3; color: #15171A; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 48px; display: flex; flex-direction: column; gap: 20px; }
+    .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #55574F; }
+    h1 { margin: 6px 0 8px; font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+    p { margin: 0; font-size: 15px; line-height: 1.55; color: #3F413A; }
+    .card { background: #FFFFFF; border: 1px solid #DCDDD5; border-radius: 18px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+    .head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .title { font-size: 18px; font-weight: 800; }
+    button, select, a.btn { font: inherit; }
+    .btn { height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #C9CAC2; background: #FFFFFF; color: #15171A; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+    .btn.on { background: #E1F2E5; border-color: #A7D7B3; color: #166534; }
+    .btn .d { width: 8px; height: 8px; border-radius: 99px; background: #9A9C94; }
+    .btn.on .d { background: #15803D; }
+    label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700; color: #3F413A; flex: 1; min-width: 220px; }
+    select { height: 44px; border-radius: 10px; border: 1px solid #C9CAC2; padding: 0 12px; background: #FFFFFF; font-size: 15px; color: #15171A; }
+    .row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+    .formula { display: flex; align-items: center; justify-content: space-between; gap: 16px; background: #F2F3EE; border-radius: 12px; padding: 14px 16px; flex-wrap: wrap; }
+    .formula small { display: block; font-size: 12px; color: #55574F; }
+    .formula b { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .badge { font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 8px; }
+    .available { background: #E1F2E5; color: #166534; }
+    .few { background: #FCEADD; color: #9A3412; }
+    .full { background: #FBE4E2; color: #991B1B; }
+    .actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .act { height: 60px; border-radius: 12px; border: 1px solid #C9CAC2; background: #FFFFFF; color: #15171A; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+    .act small { font-size: 12px; font-weight: 500; color: #55574F; }
+    .act.primary { background: #15171A; border-color: #15171A; color: #FFFFFF; }
+    .act.primary small { color: #C8CAC2; }
+    .act.dark { border-color: #15171A; }
+    .log { display: flex; flex-direction: column; }
+    .entry { display: grid; grid-template-columns: 12px 72px 1fr auto auto; align-items: center; gap: 12px; font-size: 13px; padding: 7px 0; border-top: 1px solid #EEEFE9; }
+    .entry i { width: 8px; height: 8px; border-radius: 99px; }
+    .entry span:nth-child(2) { color: #55574F; font-variant-numeric: tabular-nums; }
+    .entry b { font-weight: 700; }
+    .entry em { font-style: normal; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .muted { font-size: 13px; color: #55574F; }
+    @media (max-width: 560px) {
+      .actions { grid-template-columns: 1fr; }
+      .entry { grid-template-columns: 12px 64px 1fr; }
+      .entry .lbl, .entry em { grid-column: 3; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">DEMO CONTROLS · NOT PART OF THE APP</div>
+      <h1>Barrier simulator</h1>
+      <p>Pretend to be the Touch 'n Go reader at the car park barrier. Every scan in takes a spot, every scan out gives one back. Keep GotSpotKe open in another tab or window on this computer and watch it update.</p>
+    </div>
+
+    <div class="card">
+      <div class="head">
+        <span class="title">Car park</span>
+        <div class="row">
+          <button class="btn" id="auto" type="button" aria-pressed="false"><span class="d"></span><span id="autoLabel">Auto traffic</span></button>
+          <a class="btn" href="index.html" target="_blank" rel="noopener">Open app</a>
+        </div>
+      </div>
+      <div class="row">
+        <label>Station<select id="station"></select></label>
+      </div>
+      <div class="formula">
+        <div><small>Free = total bays − cars inside</small><b id="formula">–</b></div>
+        <span class="badge" id="barrier">–</span>
+      </div>
+      <div class="actions">
+        <button class="act primary" type="button" data-kind="in" data-n="1">Car enters<small>scan in · −1</small></button>
+        <button class="act dark" type="button" data-kind="out" data-n="1">Car exits<small>scan out · +1</small></button>
+        <button class="act" type="button" data-kind="in" data-n="25">Morning rush<small>25 cars in</small></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="head">
+        <span class="title">Scan log</span>
+        <button class="btn" id="reset" type="button">Reset demo data</button>
+      </div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/simulator.js"></script>
+</body>
+</html>
