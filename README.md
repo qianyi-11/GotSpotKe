@@ -42,7 +42,7 @@ No second tab? In the app go to **Me → Demo tools → Live simulation** and ca
 
 ## How the count works
 
-`Free spots = total bays − cars inside`. A card scan in at the barrier adds a car; a scan out removes one.
+`Spots left = total bays − cars inside`. A card scan in at the barrier adds a car; a scan out removes one.
 
 Status rule:
 - **Full**: 0 free

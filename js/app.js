@@ -196,8 +196,9 @@
       if (v.s.codes.length > 1) code += ' · ' + t.interchange;
       return '<button class="stop" type="button" data-act="open" data-id="' + id + '">' +
         '<span class="rail" aria-hidden="true"><i class="top"></i><i class="bottom"></i><b></b></span>' +
-        '<span class="stop-text"><span class="stop-code">' + esc(code) + '</span><span class="stop-name">' + esc(v.name) + '</span></span>' +
-        '<span class="stop-num"><b class="c-' + v.key + '">' + esc(v.big) + '</b><small class="i-' + v.key + '">' + esc(v.status) + '</small></span>' +
+        '<span class="stop-text"><span class="stop-code">' + esc(code) + '</span><span class="stop-name">' + esc(v.name) + '</span>' +
+          '<span class="stop-status i-' + v.key + '">' + esc(v.status) + '</span></span>' +
+        '<span class="stop-num"><b class="c-' + v.key + '">' + esc(v.big) + '</b><small>' + esc(t.free) + '</small></span>' +
       '</button>';
     }).join('');
     var seg = ['KG', 'PY'].map(function (k) {

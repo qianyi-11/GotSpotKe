@@ -44,7 +44,7 @@
       if (e.kind === 'in') { label = e.n > 1 ? e.n + ' cars in · −' + e.n : 'Scan in · −1'; color = '#C2410C'; }
       else if (e.kind === 'out') { label = e.n > 1 ? e.n + ' cars out · +' + e.n : 'Scan out · +1'; color = '#15803D'; }
       else { label = 'Barrier stays shut: full'; color = '#B91C1C'; }
-      return '<div class="entry"><i style="background:' + color + '"></i><span>' + esc(e.time) + '</span><b>' + esc(name) + '</b><span class="lbl">' + esc(label) + '</span><em>' + e.free + ' free</em></div>';
+      return '<div class="entry"><i style="background:' + color + '"></i><span>' + esc(e.time) + '</span><b>' + esc(name) + '</b><span class="lbl">' + esc(label) + '</span><em>' + e.free + ' left</em></div>';
     }).join('');
   }
 
