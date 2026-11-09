@@ -18,20 +18,23 @@ On the phone, use the browser menu → **Add to Home Screen**. GotSpotKe then op
 
 ## Demo for the judges
 
-1. Open `index.html` (the app) in one tab, or in a phone-sized window.
-2. Open `simulator.html` (the barrier simulator) in another tab on the **same computer and browser**.
-3. In the simulator pick **Kwasa Damansara** and press **Morning rush**. The app's count drops, the status changes to *Few left*, and an alert pops up because Kwasa Damansara has an alert set at 20 spots.
+All numbers are **fixed sample data** (mock), not live. The app says so itself ("Sample data" on Home, "Sample data · not live yet" on each station). Connecting real barrier data is the next phase.
 
-No second tab? In the app go to **Me → Demo tools → Live simulation** and cars will come and go on their own.
+- **"Usually full by" chart:** the blue bar marks the hour each station usually becomes full (set per station in `js/data.js`, the `fullBy` column, in minutes after midnight: 470 = 7:50 AM).
 
-**Reset demo data** (in Me, or in the simulator) puts every number back to the start.
+- **Demo clock:** the app uses 9:00 PM as the time of day for the greeting and alert times. Change `mockTime` in `js/data.js` (for example to `'08:15'` for a morning-rush story, or `null` for the real clock).
+- **Demo tools are hidden from normal users.** Add `?demo` to the address to show them in **Me**, for example `https://yourname.github.io/GotSpotKe/?demo`. They contain:
+  - **Open barrier simulator** (`simulator.html`): press *Car enters* / *Morning rush* to change a car park's count. It only affects the same browser on the same device.
+  - **Reset demo data**: puts every number back to the start.
+- **Alert demo:** Kwasa Damansara has an alert at 20 spots. Open the simulator in another tab, pick Kwasa Damansara, press *Morning rush*, then go back to the app tab: the count drops and an alert pops up.
+- Before the real launch, delete `simulator.html`, `js/simulator.js` and the Demo tools section.
 
 ## What's inside
 
 | File | What it does |
 |---|---|
 | `index.html` | The app (Home, Lines, Alerts, Me, station page) |
-| `simulator.html` | Demo-only barrier simulator |
+| `simulator.html` | Demo-only barrier simulator (link shown only with `?demo`) |
 | `css/styles.css` | All styling, light and dark mode |
 | `js/data.js` | The 32 MRT stations with Park & Ride and their bay counts |
 | `js/i18n.js` | All text in English and Bahasa Melayu (Malaysia) |

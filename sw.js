@@ -1,7 +1,7 @@
 /* GotSpotKe – service worker: keeps the app working with a weak or no connection.
  * Bump VERSION whenever you change any file so phones pick up the new version.
  */
-var VERSION = 'gsk-v2';
+var VERSION = 'gsk-v5';
 var FILES = [
   './',
   './index.html',

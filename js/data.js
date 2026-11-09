@@ -21,7 +21,7 @@
     S('kws', 'Kwasa Sentral', [['KG', 'KG05']], 500, 298, 550, 'op'),
     S('bu', 'Bandar Utama', [['KG', 'KG09']], 500, 500, 450, 'op'),
     S('ttdi', 'Taman Tun Dr Ismail', [['KG', 'KG10']], 25, 25, 420, 'flat11'),
-    S('phd', 'Phileo Damansara', [['KG', 'KG12']], 517, 431, 500, 'mrt'),
+    S('phd', 'Phileo Damansara', [['KG', 'KG12']], 517, 431, 510, 'mrt'),
     S('pbd', 'Pusat Bandar Damansara', [['KG', 'KG13']], 580, 541, 480, 'op'),
     S('mlr', 'Maluri', [['KG', 'KG22']], 253, 253, 440, 'mrt'),
     S('tmd', 'Taman Midah', [['KG', 'KG24']], 1355, 1122, 510, 'mrt'),
@@ -62,6 +62,10 @@
       KG: ['kwd', 'kws', 'bu', 'ttdi', 'phd', 'pbd', 'mlr', 'tmd', 'tsx', 'sry', 'bth', 'bkd', 'sgj', 'kjg'],
       PY: ['kwd', 'sgb', 'sdb', 'sds', 'sdt', 'mpr', 'kpb', 'jjg', 'kbt', 'ktm', 'kch', 'tne', 'sbs', 'sru', 'srs', 'upm', 'teq', 'cyu', 'pjs']
     },
+    /* Demo clock. The app shows this time of day (greeting, "now" bar, alert times)
+     * so the video looks the same whenever you film it. Use '08:15' for a morning
+     * rush story, or null to use the real clock. */
+    mockTime: '21:00',
     lines: {
       KG: { short: 'Kajang', color: '#047857' },
       PY: { short: 'Putrajaya', color: '#E0AE00' }

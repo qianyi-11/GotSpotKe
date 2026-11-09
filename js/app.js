@@ -14,7 +14,13 @@
 
   var prefs = E.loadPrefs();
   var live = E.loadLive();
+  // Demo: numbers stay fixed, and "updated" times always read a few seconds ago.
+  var appStart = Date.now();
+  D.stations.forEach(function (s, i) {
+    if (live.stations[s.id].updatedAt < appStart) live.stations[s.id].updatedAt = appStart - (4 + ((i * 7919) % 46)) * 1000;
+  });
   E.saveLive(live);
+  var demoMode = /[?&]demo\b/.test(location.search);
 
   var ui = {
     tab: 'home', detailId: null, fromApp: false,
@@ -41,12 +47,23 @@
     if (h === 0) h = 12;
     return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
   }
-  function nowMins() { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
   function rel(ts) {
-    var t = T(), s = Math.max(0, Math.round((Date.now() - ts) / 1000));
+    // Measured from when the app opened, so labels don't creep while you film.
+    var t = T(), s = Math.max(0, Math.round((appStart - ts) / 1000));
     if (s < 10) return t.justNow;
     if (s < 60) return t.secAgo(s);
-    return t.minAgo(Math.floor(s / 60));
+    if (s < 3600) return t.minAgo(Math.floor(s / 60));
+    if (s < 86400) return t.hrAgo(Math.floor(s / 3600));
+    return t.dayAgo(Math.floor(s / 86400));
+  }
+  function whenLabel(ts) {
+    var t = T(), d = new Date(ts);
+    var today = E.startOfDay(E.now());
+    var day = E.startOfDay(d);
+    var time = fmt(d.getHours() * 60 + d.getMinutes());
+    if (day === today) return t.today + ', ' + time;
+    if (day === today - 86400000) return t.yesterday + ', ' + time;
+    return d.toLocaleDateString(prefs.lang === 'ms' ? 'ms-MY' : 'en-MY', { day: 'numeric', month: 'short' }) + ', ' + time;
   }
   function num(n) { return Number(n).toLocaleString('en-MY'); }
 
@@ -101,7 +118,7 @@
   /* ---------- HOME ---------- */
   function homeHTML() {
     var t = T();
-    var h = new Date().getHours();
+    var h = E.now().getHours();
     var greeting = h < 12 ? t.gMorning : (h < 19 ? t.gAfternoon : t.gEvening);
     var mine = prefs.favs.map(vm);
     var withSpace = mine.filter(function (v) { return v.free > 0; }).length;
@@ -110,13 +127,10 @@
     else if (withSpace === mine.length) summary = mine.length === 1 ? t.sumOne : t.sumAll(mine.length);
     else if (withSpace === 0) summary = t.sumZero;
     else summary = t.sumSome(withSpace, mine.length);
-    var latest = 0;
-    D.stations.forEach(function (s) { latest = Math.max(latest, live.stations[s.id].updatedAt); });
 
     return '<div class="page">' +
       '<div class="topbar">' +
         '<div class="brand"><span class="logo" aria-hidden="true">P</span><span class="brand-name">GotSpotKe</span></div>' +
-        '<span class="live-pill"><span class="dot"></span>' + esc(t.live) + ' · ' + relSpan(latest, 'plain') + '</span>' +
       '</div>' +
       '<div><h1 class="h1">' + esc(greeting) + '</h1><p class="lede">' + esc(summary) + '</p></div>' +
       '<label class="search">' + ICON.search +
@@ -125,7 +139,6 @@
         (ui.query ? '<button class="icon-btn" type="button" data-act="clear-search" aria-label="' + esc(t.clearSearch) + '">' + ICON.x + '</button>' : '') +
       '</label>' +
       '<div id="homeLists" class="section" style="gap:18px">' + homeListsHTML() + '</div>' +
-      '<p class="footnote">' + esc(t.sample) + '</p>' +
     '</div>';
   }
 
@@ -162,7 +175,12 @@
       out += '</section>';
     }
 
-    var list = D.stations.filter(function (s) { return !q || s.name.toLowerCase().indexOf(q) >= 0; }).map(function (s) { return vm(s.id); });
+    var qc = q.replace(/\s+/g, '');
+    var list = D.stations.filter(function (s) {
+      if (!q) return true;
+      if (s.name.toLowerCase().indexOf(q) >= 0) return true;
+      return s.codes.some(function (c) { return c[1].toLowerCase().indexOf(qc) === 0; });
+    }).map(function (s) { return vm(s.id); });
     out += '<section class="section">' +
       '<div class="section-head"><h2 class="section-title">' + esc(q ? t.results : t.allStations) + '</h2>' +
       '<span class="count">' + esc(t.stationsN(list.length)) + '</span></div>';
@@ -230,7 +248,7 @@
     }).join('');
     var hist = prefs.history.map(function (h) {
       var text = h.kind === 'full' ? t.histFull(h.name) : t.histLow(h.n, h.name);
-      var when = (h.day === 'today' ? t.today : t.yesterday) + ', ' + fmt(h.mins);
+      var when = whenLabel(h.ts);
       return '<div class="hist">' + ICON.bell + '<div><b>' + esc(text) + '</b><small>' + esc(when) + '</small></div></div>';
     }).join('');
 
@@ -289,26 +307,23 @@
         '<div class="card settings" style="overflow:hidden">' +
           '<button class="ghost-btn" type="button" data-act="about" data-v="how" aria-expanded="' + (ui.about === 'how') + '">' + esc(t.howTitle) + ICON.chevron + '</button>' +
           (ui.about === 'how' ? '<p class="expand">' + esc(t.howText) + '</p>' : '') +
-          '<button class="ghost-btn" type="button" data-act="about" data-v="proto" aria-expanded="' + (ui.about === 'proto') + '">' + esc(t.protoTitle) + ICON.chevron + '</button>' +
-          (ui.about === 'proto' ? '<p class="expand">' + esc(t.protoText) + '</p>' : '') +
         '</div>' +
       '</section>' +
-      '<section class="section"><h2 class="section-title">' + esc(t.demoTools) + '</h2>' +
+      (demoMode ? '<section class="section"><h2 class="section-title">' + esc(t.demoTools) + '</h2>' +
         '<div class="card settings" style="overflow:hidden">' +
-          '<div class="set inline"><span class="set-label"><b>' + esc(t.liveSim) + '</b><span>' + esc(t.liveSimSub) + '</span></span>' +
-            '<button class="switch" type="button" role="switch" data-act="live-sim" aria-checked="' + !!prefs.liveSim + '" aria-label="' + esc(t.liveSim) + '"></button></div>' +
           '<a class="ghost-btn" href="simulator.html" target="_blank" rel="noopener">' + esc(t.openSim) + ICON.external + '</a>' +
           '<button class="ghost-btn danger" type="button" data-act="reset-demo">' + esc(t.resetDemo) + '</button>' +
         '</div>' +
-      '</section>' +
+      '</section>' : '') +
       '<p class="footnote">' + esc(t.version) + '</p>' +
     '</div>';
   }
 
   /* ---------- STATION DETAIL ---------- */
   function chartHTML(s) {
-    var nowH = new Date().getHours(), out = '';
-    for (var h = 6; h <= 20; h++) {
+    // Blue bar = the hour the car park usually becomes full (fixed per station, not live).
+    var fullH = s.fullBy ? Math.ceil(s.fullBy / 60) : -1, out = '';
+    for (var h = 6; h <= 22; h++) {
       var tm = h * 60, p;
       if (s.fullBy) {
         if (tm <= s.fullBy) p = 0.08 + 0.92 * (tm - 360) / Math.max(1, s.fullBy - 360);
@@ -320,7 +335,10 @@
         else p = 0.75 - (h - 17) * 0.15;
       }
       p = Math.max(0.06, Math.min(1, p));
-      out += '<span class="' + (h === nowH ? 'now' : '') + '" style="height:' + Math.round(p * 50) + 'px"></span>';
+      var hit = h === fullH;
+      out += '<span class="col">' +
+        (hit ? '<em>' + esc(fmt(s.fullBy).replace(' AM', '').replace(' PM', '')) + '</em>' : '') +
+        '<span class="b' + (hit ? ' now' : '') + '" style="height:' + Math.round(p * 50) + 'px"></span></span>';
     }
     return out;
   }
@@ -341,7 +359,6 @@
       '<div class="section" style="gap:8px">' +
         '<div class="chips">' + chipsHTML(s, true) + '</div>' +
         '<h1 class="station-name">' + esc(v.name) + '</h1>' +
-        '<span class="meta">' + relSpan(v.updatedAt, 'updated') + '</span>' +
       '</div>' +
       '<div class="card hero">' +
         '<div class="hero-top">' +
@@ -359,12 +376,12 @@
         '<div><b>' + esc(s.fullBy ? t.usuallyFull(fmt(s.fullBy)) : t.rarely) + '</b>' +
         '<p>' + esc(s.fullBy ? t.tipBy(fmt(s.fullBy - 15)) : t.tipSpace) + '</p></div>' +
         '<div class="chart" aria-hidden="true">' + chartHTML(s) + '</div>' +
-        '<div class="chart-axis" aria-hidden="true"><span>6am</span><span>12pm</span><span>8pm</span></div>' +
+        '<div class="chart-axis" aria-hidden="true"><span>6am</span><span>2pm</span><span>10pm</span></div>' +
+        '<span class="chart-note">' + esc(s.fullBy ? t.chartFull : t.chartRarely) + '</span>' +
       '</div>' +
       '<div class="info">' +
         '<span><strong>' + esc(t.feeL) + '</strong> ' + esc(fee) + '</span>' +
         '<span><strong>' + esc(t.payL) + '</strong> ' + esc(t.pay) + '</span>' +
-        (s.unverified ? '<span class="note">' + esc(t.unverifiedNote) + '</span>' : '') +
       '</div>' +
     '</div>';
   }
@@ -518,7 +535,7 @@
       var after = s.capacity - next.stations[id].occupied;
       if (before >= a.level && after < a.level) {
         hit = { id: id, kind: after === 0 ? 'full' : 'low', name: s.name, n: after, level: a.level };
-        prefs.history.unshift({ id: 'h' + Date.now() + id, kind: hit.kind, name: s.name, n: after, day: 'today', mins: nowMins() });
+        prefs.history.unshift({ id: 'h' + Date.now() + id, kind: hit.kind, name: s.name, n: after, ts: E.now().getTime() });
         prefs.history = prefs.history.slice(0, 20);
         if (!(ui.tab === 'alerts' && !ui.detailId)) prefs.unread += 1;
         tryNotify(hit);
@@ -551,20 +568,6 @@
     if (e.key === E.KEY_PREFS) { prefs = E.loadPrefs(); render(); }
   });
 
-  setInterval(function () {
-    if (!prefs.liveSim) return;
-    var s = D.stations[Math.floor(Math.random() * D.stations.length)];
-    applyLive(E.gate(live, s.id, Math.random() < 0.65 ? 'in' : 'out', 1), false);
-  }, 1500);
-
-  // Keep "12s ago" labels fresh without re-drawing the screen.
-  setInterval(function () {
-    var t = T();
-    Array.prototype.forEach.call(document.querySelectorAll('[data-ts]'), function (el) {
-      var ts = Number(el.getAttribute('data-ts'));
-      el.textContent = el.getAttribute('data-kind') === 'updated' ? t.updated(rel(ts)) : rel(ts);
-    });
-  }, 5000);
 
   /* ---------- toast ---------- */
   function showToast(key, arg, undoId) {
@@ -641,7 +644,6 @@
     level: function (d) { prefs.defaultLevel = Number(d.v); save(); render(); },
     show: function (d) { prefs.showAs = d.v; save(); render(); },
     about: function (d) { ui.about = ui.about === d.v ? '' : d.v; render(); },
-    'live-sim': function () { prefs.liveSim = !prefs.liveSim; save(); render(); },
     'reset-demo': function () {
       var keepLang = prefs.lang, keepDark = prefs.dark;
       prefs = E.seedPrefs();

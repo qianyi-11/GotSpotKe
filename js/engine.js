@@ -21,6 +21,17 @@
     try { window.localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* private mode: keep in memory */ }
   }
 
+  /* ---------- clock (real date, demo time of day) ---------- */
+  function now() {
+    var d = new Date();
+    if (D.mockTime) {
+      var hm = D.mockTime.split(':');
+      d.setHours(Number(hm[0]), Number(hm[1]), 0, 0);
+    }
+    return d;
+  }
+  function startOfDay(d) { var x = new Date(d.getTime()); x.setHours(0, 0, 0, 0); return x.getTime(); }
+
   /* ---------- live car park counts ---------- */
   function seedLive() {
     var now = Date.now();
@@ -101,15 +112,19 @@
       showAs: 'spots',
       defaultLevel: 20,
       morning: true,
-      liveSim: false,
       favs: ['kwd', 'sgb'],
       alerts: { kwd: { level: 20, on: true }, sgb: { level: 50, on: false } },
-      history: [
-        { id: 'h0', kind: 'full', name: 'Sungai Buloh', n: 0, day: 'yesterday', mins: 461 },
-        { id: 'h1', kind: 'low', name: 'Kwasa Damansara', n: 15, day: 'yesterday', mins: 458 }
-      ],
+      history: seedHistory(),
       unread: 0
     };
+  }
+
+  function seedHistory() {
+    var yesterday = startOfDay(now()) - 86400000;
+    return [
+      { id: 'h0', kind: 'full', name: 'Sungai Buloh', n: 0, ts: yesterday + 461 * 60000 },
+      { id: 'h1', kind: 'low', name: 'Kwasa Damansara', n: 15, ts: yesterday + 458 * 60000 }
+    ];
   }
 
   function loadPrefs() {
@@ -118,6 +133,13 @@
     if (!p) return base;
     Object.keys(base).forEach(function (k) { if (p[k] === undefined) p[k] = base[k]; });
     p.favs = p.favs.filter(function (id) { return !!D.byId[id]; });
+    // older saved history used day/mins: convert it to a real timestamp
+    p.history = (p.history || []).map(function (h) {
+      if (h.ts) return h;
+      var day = startOfDay(now()) - (h.day === 'today' ? 0 : 86400000);
+      return { id: h.id, kind: h.kind, name: h.name, n: h.n, ts: day + (h.mins || 0) * 60000 };
+    });
+    delete p.liveSim;
     return p;
   }
 
@@ -125,6 +147,8 @@
 
   window.GSK_ENGINE = {
     KEY_LIVE: KEY_LIVE,
+    now: now,
+    startOfDay: startOfDay,
     KEY_PREFS: KEY_PREFS,
     seedLive: seedLive,
     loadLive: loadLive,
