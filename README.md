@@ -52,7 +52,7 @@ Each station page tells you what you'll pay (for example *RM4.30 per entry if yo
 
 ## Get it on your phone
 
-1. Open **https://qianyi-11.github.io/GotSpotKe/** on your phone.
+1. Open **https://gotspotke.vercel.app/** on your phone.
 2. **Android (Chrome):** tap the menu (⋮), then **Add to Home Screen**.<br>
    **iPhone (Safari):** tap **Share**, then **Add to Home Screen**.
 3. Open GotSpotKe from your home screen and save your station.
