@@ -88,7 +88,7 @@ Built with plain HTML, CSS and JavaScript: no build step, no dependencies.
 
 - **On this computer:** double-click `index.html`.
 - **Local server:** run `python -m http.server 8000` in this folder, then open `http://localhost:8000` (or `http://<your-computer-IP>:8000` from a phone on the same Wi-Fi).
-- **Publish:** push to GitHub and turn on Pages (Settings → Pages → deploy from `main`), or drag the folder onto https://app.netlify.com/drop.
+- **Publish:** https://gotspotke.vercel.app/
 
 ### Demo mode
 
