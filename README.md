@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://qianyi-11.github.io/GotSpotKe/"><b>Open GotSpotKe →</b></a>
+  <a href="https://gotspotke.vercel.app/"><b>Open GotSpotKe →</b></a>
 </p>
 
 ---
