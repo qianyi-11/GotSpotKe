@@ -1,66 +1,124 @@
-# GotSpotKe
+<p align="center">
+  <img src="icons/icon-192.png" width="96" height="96" alt="GotSpotKe app icon">
+</p>
 
-**GotSpotKe? Got lah!** A mobile web app that shows how many Park & Ride spots are free at Klang Valley MRT stations, so you know before you drive.
+<h1 align="center">GotSpotKe</h1>
 
-Prototype for competition. Built with plain HTML, CSS and JavaScript: no install, no build step.
+<p align="center">
+  <b>GotSpotKe? Got lah!</b><br>
+  Know if there's parking at your MRT station <i>before</i> you leave the house.
+</p>
 
-## Open it
+<p align="center">
+  <a href="https://qianyi-11.github.io/GotSpotKe/"><b>Open GotSpotKe →</b></a>
+</p>
 
-**On this computer:** double-click `index.html`. It opens in your browser.
+---
 
-**On a phone (recommended for the demo):** the app needs to be on a web address. Pick one:
+## Introducing GotSpotKe
 
-1. **Netlify Drop (easiest, free):** go to https://app.netlify.com/drop and drag the whole `GotSpotKe` folder onto the page. You get a link like `https://something.netlify.app` to open on any phone.
-2. **GitHub Pages:** push this folder to a GitHub repo, then Settings → Pages → deploy from the main branch.
-3. **Same Wi-Fi, quick test:** in this folder run `python -m http.server 8000`, then on the phone open `http://<your-computer-IP>:8000`.
+It's 7:45 AM. You drive to the MRT station, circle the Park & Ride, and the barrier says **FULL**. Now you're late, and still looking for a spot.
 
-On the phone, use the browser menu → **Add to Home Screen**. GotSpotKe then opens full screen like a normal app.
+**GotSpotKe fixes that.** It shows how many Park & Ride spots are left at every Klang Valley MRT station, so you can check from home and pick a station that still has space.
 
-## Demo for the judges
+No download from an app store, no sign-up. Open the link, save your station, and go.
 
-All numbers are **fixed sample data** (mock), not live. The app says so itself ("Sample data" on Home, "Sample data · not live yet" on each station). Connecting real barrier data is the next phase.
+## What you can do
 
-- **"Usually full by" chart:** the blue bar marks the hour each station usually becomes full (set per station in `js/data.js`, the `fullBy` column, in minutes after midnight: 470 = 7:50 AM).
+### 🅿️ See spots left at a glance
+Every station shows a big, clear number of **spots left**, with a colour status:
+**Available**, **Few left** or **Full**. Prefer percentages? Switch in Settings.
 
-- **Demo clock:** the app uses 9:00 PM as the time of day for the greeting and alert times. Change `mockTime` in `js/data.js` (for example to `'08:15'` for a morning-rush story, or `null` for the real clock).
-- **Demo tools are hidden from normal users.** Add `?demo` to the address to show them in **Me**, for example `https://yourname.github.io/GotSpotKe/?demo`. They contain:
-  - **Open barrier simulator** (`simulator.html`): press *Car enters* / *Morning rush* to change a car park's count. It only affects the same browser on the same device.
+### ⭐ Save your stations
+Tap the bookmark next to the station you park at. It moves to the top of Home, with a one-line summary like *"All 2 of your stations have space right now."*
+
+### 🔔 Get an alert before it fills up
+Set an alert, such as *"tell me when fewer than 20 spots are left"*, and GotSpotKe warns you as your car park runs low. Turn on **Morning check** to get an update at 7:00 AM on weekdays.
+
+### 🕗 Know when it usually fills
+Each station has a chart of a normal weekday showing **when it usually becomes full**, plus a tip like *"Get there before 7:50 AM to be safe."*
+
+### 🚇 Browse by line
+See all **32 stations with Park & Ride** on the **Kajang Line** and **Putrajaya Line**, in order along each line.
+
+### 💳 Fees and payment, upfront
+Each station page tells you what you'll pay (for example *RM4.30 per entry if you ride the MRT with the same card*) and how to pay, with a **Navigate** button to get you there.
+
+### 🌙 Made for real life
+- **English and Bahasa Melayu**
+- **Dark mode** for early mornings and late nights
+- **Add to Home Screen** and it opens full screen like a normal app
+- Works **offline** after your first visit
+
+## Get it on your phone
+
+1. Open **https://qianyi-11.github.io/GotSpotKe/** on your phone.
+2. **Android (Chrome):** tap the menu (⋮), then **Add to Home Screen**.<br>
+   **iPhone (Safari):** tap **Share**, then **Add to Home Screen**.
+3. Open GotSpotKe from your home screen and save your station.
+
+## How we count the spots
+
+Every car scans a card at the barrier.
+**Scan in:** one spot gone. **Scan out:** one spot back.
+
+> **Spots left = total bays − cars inside**
+
+The count resets each night when the car park is empty, so small errors don't build up.
+
+| Status | When |
+|---|---|
+| **Available** | More than 30 spots left |
+| **Few left** | 30 or fewer left (10 or fewer for car parks under 100 bays) |
+| **Full** | No spots left |
+
+## Where we are now
+
+GotSpotKe is a **prototype**. Station names and bay totals are real, taken from MRT Corp's Park 'N' Ride pages and public station info (checked November 2026). **The numbers of cars inside, and the "usually full by" times, are sample data for now.** The app says so on every screen. Connecting live barrier data is the next step.
+
+Have feedback or want to help bring live data in? [Open an issue](https://github.com/qianyi-11/GotSpotKe/issues).
+
+---
+
+## For developers and demos
+
+Built with plain HTML, CSS and JavaScript: no build step, no dependencies.
+
+### Run it
+
+- **On this computer:** double-click `index.html`.
+- **Local server:** run `python -m http.server 8000` in this folder, then open `http://localhost:8000` (or `http://<your-computer-IP>:8000` from a phone on the same Wi-Fi).
+- **Publish:** push to GitHub and turn on Pages (Settings → Pages → deploy from `main`), or drag the folder onto https://app.netlify.com/drop.
+
+### Demo mode
+
+- Add `?demo` to the address to show **Demo tools** in **Me**:
+  - **Open barrier simulator** (`simulator.html`): press *Car enters* or *Morning rush* to change a car park's count (same browser, same device only).
   - **Reset demo data**: puts every number back to the start.
-- **Alert demo:** Kwasa Damansara has an alert at 20 spots. Open the simulator in another tab, pick Kwasa Damansara, press *Morning rush*, then go back to the app tab: the count drops and an alert pops up.
-- Before the real launch, delete `simulator.html`, `js/simulator.js` and the Demo tools section.
+- **Alert demo:** Kwasa Damansara has an alert at 20 spots. Open the simulator in another tab, pick Kwasa Damansara, press *Morning rush*, then go back to the app: the count drops and an alert pops up.
+- **Demo clock:** `mockTime` in `js/data.js` sets the time of day (for example `'08:15'` for the morning rush, or `null` for the real clock).
+- Before a real launch, delete `simulator.html`, `js/simulator.js` and the Demo tools section.
 
-## What's inside
+### What's inside
 
 | File | What it does |
 |---|---|
 | `index.html` | The app (Home, Lines, Alerts, Me, station page) |
-| `simulator.html` | Demo-only barrier simulator (link shown only with `?demo`) |
+| `simulator.html` | Demo-only barrier simulator |
 | `css/styles.css` | All styling, light and dark mode |
-| `js/data.js` | The 32 MRT stations with Park & Ride and their bay counts |
-| `js/i18n.js` | All text in English and Bahasa Melayu (Malaysia) |
+| `js/data.js` | The 32 stations, bay counts, fees and "usually full by" times |
+| `js/i18n.js` | All text in English and Bahasa Melayu |
 | `js/engine.js` | Counting logic, status rules, saved settings |
 | `js/app.js` | Screens and buttons |
 | `js/simulator.js` | Simulator logic |
-| `manifest.webmanifest`, `sw.js`, `icons/` | Add-to-Home-Screen and offline support |
+| `manifest.webmanifest`, `sw.js`, `icons/` | Add to Home Screen and offline support |
 
-## How the count works
+### Data notes
 
-`Spots left = total bays − cars inside`. A card scan in at the barrier adds a car; a scan out removes one.
-
-Status rule:
-- **Full**: 0 free
-- **Few left**: 30 or fewer free (10 or fewer for car parks under 100 bays)
-- **Available**: everything else
-
-## Data
-
-- 14 Kajang Line and 18 Putrajaya Line stations with Park & Ride (Kwasa Damansara serves both lines).
-- Bay totals come from MRT Corp's Park 'N' Ride pages (https://sites.google.com/view/mrtparknride/home) and public station info, checked November 2026.
-- **Sample data:** how full each car park is, and "usually full by" times, are made up for the demo.
+- 14 Kajang Line and 18 Putrajaya Line stations (Kwasa Damansara serves both lines).
 - **Kampung Batu:** bay count not confirmed; 200 is an estimate.
-- To change a station, edit `js/data.js`.
+- `fullBy` in `js/data.js` is in minutes after midnight (470 = 7:50 AM).
 
-## Changing things later
+### Updating the live site
 
-- Edit text in `js/i18n.js` (both languages).
-- After changing any file on a live site, bump `VERSION` in `sw.js` (e.g. `gsk-v2`) so phones load the new version.
+After changing any file, bump `VERSION` in `sw.js` (for example `gsk-v2`) so phones load the new version.
